@@ -24,16 +24,16 @@ public class UserRequesterFrontend {
         if (type.equals("html")) {
             return "<div>"
              + "<h1>User</h1>"
-             + "<span>" + user.nameOfUser + "</span>"
-             + "<span>" + user.bd + "</span>"
-             + "<span>" + user.ifuserisolder + "</span>"
+             + "<span>" + user.username + "</span>"
+             + "<span>" + user.birthDate + "</span>"
+             + "<span>" + user.isMajor + "</span>"
              + "</div>";
         } else {
             if (type.equals("xml")) {
                 return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>"
-                    + "<name> " + user.nameOfUser + "</name>"
-                    + "<bd>" + user.bd + "</bd>"
-                    + "<older> " + user.ifuserisolder + "</older>";
+                    + "<itemName> " + user.username + "</itemName>"
+                    + "<birthDate>" + user.birthDate + "</birthDate>"
+                    + "<older> " + user.isMajor + "</older>";
             } else {
                 //do nothing
                 return "";
@@ -52,13 +52,13 @@ public class UserRequesterFrontend {
             return "<div>"
              + "<h1>ShoppingCart</h1>"
              + "<span> " + shoppingCart.user + "</span>"
-             + "<span> " + shoppingCart.itens + "</span>"
+             + "<span> " + shoppingCart.shoppingCartItemList + "</span>"
              + "</div>";
         } else {
             if (type.equals("xml")) {
                 return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>"
                     + "<user> " + shoppingCart.user + "</user>"
-                    + "<itens> " + shoppingCart.itens + "</itens>";
+                    + "<shoppingCartItemList> " + shoppingCart.shoppingCartItemList + "</shoppingCartItemList>";
             } else {
                 //do nothing
                 return "";
@@ -76,13 +76,13 @@ public class UserRequesterFrontend {
         if (type.equals("html")) {
             return "<div>"
              + "<h1>Item</h1>"
-             + "<span> " + item.name + "</span>"
-             + "<span> " + item.valor + "</span>"
+             + "<span> " + item.itemName + "</span>"
+             + "<span> " + item.amount + "</span>"
              + "</div>";
         } else {
             if (type.equals("xml")) {
-                return "<name> " + item.name + "</name>"
-                    + "<valor> " + item.valor + "</valor>";
+                return "<itemName> " + item.itemName + "</itemName>"
+                    + "<amount> " + item.amount + "</amount>";
             } else {
                 //do nothing
                 return "";
