@@ -4,7 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import com.celfocus.training.Saver;
-import com.celfocus.training.Saver.ItemInfo;
+import com.celfocus.training.Saver.Product;
 import com.celfocus.training.Saver.ShoppingCart;
 import com.celfocus.training.Saver.User;
 import com.celfocus.training.util.Utils;
@@ -31,7 +31,7 @@ public class UserRequesterFrontend {
         } else {
             if (type.equals("xml")) {
                 return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>"
-                    + "<itemName> " + user.username + "</itemName>"
+                    + "<productName> " + user.username + "</productName>"
                     + "<birthDate>" + user.birthDate + "</birthDate>"
                     + "<older> " + user.isMajor + "</older>";
             } else {
@@ -72,16 +72,16 @@ public class UserRequesterFrontend {
      * @param item item que será renderizado
      * @return o texto no formato solicitado com as informarções do item
      */
-    public String returnFrontendItem(String type, ItemInfo item) {
+    public String returnFrontendItem(String type, Product item) {
         if (type.equals("html")) {
             return "<div>"
              + "<h1>Item</h1>"
-             + "<span> " + item.itemName + "</span>"
+             + "<span> " + item.productName + "</span>"
              + "<span> " + item.amount + "</span>"
              + "</div>";
         } else {
             if (type.equals("xml")) {
-                return "<itemName> " + item.itemName + "</itemName>"
+                return "<productName> " + item.productName + "</productName>"
                     + "<amount> " + item.amount + "</amount>";
             } else {
                 //do nothing
@@ -125,7 +125,7 @@ public class UserRequesterFrontend {
 
         nameItem = nameItem.toLowerCase().concat("_item");
 
-        saver.aIU(user, nameItem, qt);
+        saver.addItemUnit(user, nameItem, qt);
     }
 
 }

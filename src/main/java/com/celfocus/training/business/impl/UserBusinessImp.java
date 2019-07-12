@@ -1,14 +1,16 @@
 package com.celfocus.training.business.impl;
 
+
 import com.celfocus.training.model.User;
-import com.celfocus.training.business.UserBusiness;
+import com.celfocus.training.business.IUserBusiness;
 import com.celfocus.training.business.exception.DeleteException;
 import com.celfocus.training.business.exception.SaveException;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserBusinessImp implements UserBusiness {
+
+public class UserBusinessImp extends AbstractOperations<User> implements IUserBusiness {
 
     private List<User> userList;
 
@@ -24,10 +26,27 @@ public class UserBusinessImp implements UserBusiness {
     }
 
     @Override
+    public User update(User userWithChange) throws SaveException {
+        User userUpdate = null;
+
+        for (User userToUpdate : userList) {
+            if (userToUpdate.getUsername().equals(userWithChange.getUsername())) {
+                userToUpdate.setMajor(userWithChange.isMajor());
+                userToUpdate.setBirthDate(userWithChange.getBirthDate());
+                userUpdate = userToUpdate;
+                break;
+            }
+        }
+
+        return userUpdate;
+
+    }
+
+    @Override
     public User find(String username) {
 
-        for (User userIteration: userList) {
-            if (userIteration.getUsername().equals(username)){
+        for (User userIteration : userList) {
+            if (userIteration.getUsername().equals(username)) {
                 return userIteration;
             }
         }
@@ -46,7 +65,7 @@ public class UserBusinessImp implements UserBusiness {
         return userList.contains(user) || existingUsername(user.getUsername());
     }
 
-    private boolean existingUsername(String username){
+    private boolean existingUsername(String username) {
         return userList.stream()
                 .anyMatch(user -> user.getUsername().equals(username));
     }
