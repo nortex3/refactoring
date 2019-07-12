@@ -26,4 +26,12 @@ public class User extends AbstractModel {
     public boolean isMajor() {
         return isMajor;
     }
+
+    public void setBirthDate(Date birthDate) {
+        this.birthDate = birthDate;
+    }
+
+    public void setMajor(boolean major) {
+        isMajor = major;
+    }
 }
