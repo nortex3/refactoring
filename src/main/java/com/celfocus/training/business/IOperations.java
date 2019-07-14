@@ -3,11 +3,13 @@ package com.celfocus.training.business;
 import com.celfocus.training.business.exception.DeleteException;
 import com.celfocus.training.business.exception.SaveException;
 
+import java.util.List;
+
 public interface IOperations<T> {
 
-    void save(T t) throws SaveException;
-    T update(T t) throws SaveException;
-    T find(String string);
-    boolean delete(T t) throws DeleteException;
+    void save(T model) throws SaveException;
+    void update(int indexInList, T model) throws SaveException;
+    List<T> getAll();
+    void delete(int index) throws DeleteException;
 
 }
