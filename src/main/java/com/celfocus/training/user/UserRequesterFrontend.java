@@ -10,21 +10,10 @@ import com.celfocus.training.ShoppingCart;
 import com.celfocus.training.User;
 import com.celfocus.training.util.Utils;
 
-/**
- * User For Frontent
- */
 public class UserRequesterFrontend {
 
     private Integer seniorCutOffAge = 65;
 
-
-    /**
-     * Metodo utilizado para retornar o Usuario no formato do frontend solicitado
-     *
-     * @param requestedType tipo do frontend utilizado
-     * @param user usuario que será renderizado
-     * @return o texto no formato solicitado com as informarções do user
-     */
     public String returnFrontendUser(String requestedType, User user) {
         if (requestedType.equals(FormatType.HTML)) {
             return "<div>"
@@ -41,17 +30,8 @@ public class UserRequesterFrontend {
                     + "<older> " + user.isSenior + "</older>";
         }
         return "";
-
-
     }
 
-    /**
-     * Metodo utilizado para retornar o Shoppingcart no formato do frontend solicitado
-     *
-     * @param requestedType         tipo do frontend utilizado
-     * @param shoppingCart shoppingCart que será renderizado
-     * @return o texto no formato solicitado com as informarções do shoppingCart
-     */
     public String returnFrontendShoppingCart(String requestedType, ShoppingCart shoppingCart) {
         if (requestedType.equals(FormatType.HTML)) {
             return "<div>"
@@ -70,13 +50,6 @@ public class UserRequesterFrontend {
 
     }
 
-    /**
-     * Metodo utilizado para retornar o Item no formato do frontend solicitado
-     *
-     * @param requestedType tipo do frontend utilizado
-     * @param item item que será renderizado
-     * @return o texto no formato solicitado com as informarções do item
-     */
     public String returnFrontendItem(String requestedType, ItemInfo item) {
         if (requestedType.equals(FormatType.HTML)) {
             return "<div>"
@@ -90,53 +63,39 @@ public class UserRequesterFrontend {
                     + "<valor> " + item.valor + "</valor>";
         }
         return "";
-
-
     }
 
-    /**
-     * Cria ou atualiza usuario
-     *
-     * @param username
-     * @param birthDate
-     * @param
-     */
     public void createOrUpdateUser(String username, String birthDate) {
         App app = new App();
         Boolean userIsSenior;
         username = username.toUpperCase();
 
         Date formattedBirthDate = Utils.toDate(birthDate, new SimpleDateFormat("dd/mm/yyyy"));
-        if (!UserIsSenior(formattedBirthDate)) {
-            userIsSenior = false;
-        }else{
+        if (UserIsSenior(formattedBirthDate)) {
             userIsSenior = true;
+        }else{
+            userIsSenior = false;
         }
-
         app.saveOrUpdateUser(username, Utils.toDate(birthDate, new SimpleDateFormat("dd/mm/yyyy")), userIsSenior);
     }
 
-    private boolean UserIsSenior(Date date) {
-        return new Date().getYear() - date.getYear() < seniorCutOffAge;
-    }
 
-    /**
-     * Remover Usuario
-     */
     public void deleteUser(String username) {
         App app = new App();
         app.deleteUser(username);
     }
 
-    /**
-     * Adicionar item ao carrinho
-     */
-    public void addItem(String user, String nameItem, int qt) {
+
+    public void addItem(String user, String nameItem, int quantity) {
         App app = new App();
 
         nameItem = nameItem.toLowerCase().concat("_item");
 
-        app.aIU(user, nameItem, qt);
+        app.aIU(user, nameItem, quantity);
     }
 
+
+    private boolean UserIsSenior(Date birthDate) {
+        return new Date().getYear() - birthDate.getYear() >= seniorCutOffAge;
+    }
 }
