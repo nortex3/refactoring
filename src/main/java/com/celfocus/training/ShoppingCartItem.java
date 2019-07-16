@@ -2,9 +2,9 @@ package com.celfocus.training;
 
 public class ShoppingCartItem {
 
-    public ItemInfo item;
+    public ItemInfo itemInfo;
 
-    public int qt;
+    public int quantity;
 
     public double discount;
 

@@ -30,6 +30,7 @@ public class UserRequesterFrontend {
                     + "<older> " + user.isSenior + "</older>";
         }
         return "";
+
     }
 
     public String returnFrontendShoppingCart(String requestedType, ShoppingCart shoppingCart) {
@@ -46,8 +47,6 @@ public class UserRequesterFrontend {
                     + "<items> " + shoppingCart.items + "</items>";
         }
         return "";
-
-
     }
 
     public String returnFrontendItem(String requestedType, ItemInfo item) {
@@ -55,33 +54,31 @@ public class UserRequesterFrontend {
             return "<div>"
                     + "<h1>Item</h1>"
                     + "<span> " + item.name + "</span>"
-                    + "<span> " + item.valor + "</span>"
+                    + "<span> " + item.price + "</span>"
                     + "</div>";
         }
         if (requestedType.equals(FormatType.XML)) {
             return "<name> " + item.name + "</name>"
-                    + "<valor> " + item.valor + "</valor>";
+                    + "<price> " + item.price + "</price>";
         }
         return "";
     }
 
     public void createOrUpdateUser(String username, String birthDate) {
         App app = new App();
-        Boolean userIsSenior;
-        username = username.toUpperCase();
+        boolean userIsSenior;
 
+        username = username.toUpperCase();
         Date formattedBirthDate = Utils.toDate(birthDate, new SimpleDateFormat("dd/mm/yyyy"));
-        if (UserIsSenior(formattedBirthDate)) {
-            userIsSenior = true;
-        }else{
-            userIsSenior = false;
-        }
+        userIsSenior = UserIsSenior(formattedBirthDate);
+
         app.saveOrUpdateUser(username, Utils.toDate(birthDate, new SimpleDateFormat("dd/mm/yyyy")), userIsSenior);
     }
 
 
     public void deleteUser(String username) {
         App app = new App();
+
         app.deleteUser(username);
     }
 
@@ -91,7 +88,7 @@ public class UserRequesterFrontend {
 
         nameItem = nameItem.toLowerCase().concat("_item");
 
-        app.aIU(user, nameItem, quantity);
+        app.addItemToCart(user, nameItem, quantity);
     }
 
 
