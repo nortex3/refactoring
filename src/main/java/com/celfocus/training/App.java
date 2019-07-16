@@ -15,31 +15,31 @@ public class App {
     private static final List<ItemInfo> itens = new ArrayList<>();
 
     public User saveOrUpdateUser(String username, Date birthDate, boolean isSenior) {
+
         if (userExists(username)) {
             User user = findUser(username);
             user.birthDate = birthDate;
             user.isSenior = isSenior;
-            ShoppingCart shoppingCart = findShoppingCart(user).get();
-
-            if (shoppingCart == null) {
-                shoppingCart = new ShoppingCart();
-                shoppingCart.user = user;
-                shoppingCarts.add(user);
-            }
+            ShoppingCart shoppingCart = findShoppingCart(user).orElse(null);
+            if (shoppingCart == null) createNewShoppingCart(user);
             users.add(user);
             return user;
         } else {
             User user = new User();
-            user.birthDate = birthDate;
             user.username = username;
+            user.birthDate = birthDate;
             user.isSenior = isSenior;
+            createNewShoppingCart(user);
             users.add(user);
-            ShoppingCart s = new ShoppingCart();
-            s.user = user;
-            s.items = new ArrayList<>();
-            shoppingCarts.add(s);
             return user;
         }
+    }
+
+    private void createNewShoppingCart(User user) {
+        ShoppingCart shoppingCart = new ShoppingCart();
+        shoppingCart.user = user;
+        shoppingCart.items = new ArrayList<>();
+        shoppingCarts.add(shoppingCart);
     }
 
     private Optional<ShoppingCart> findShoppingCart(User user) {
