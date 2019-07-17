@@ -6,14 +6,13 @@ import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
+import com.celfocus.training.View.TypeFile;
+import com.celfocus.training.controller.dtos.IGenericDTO;
 import org.apache.commons.codec.binary.Hex;
+
+import static com.celfocus.training.util.constant.ConstantStrings.FORMAT_DATE;
 
 public final class Utils {
 
@@ -43,30 +42,20 @@ public final class Utils {
     
     public static Map<String, String> parseHTTPHeaderMap(String headers) {
         String value = headers.substring(1, headers.length() - 1);
-        String[] keyValuePairs = value.split(",");              //split the string to creat key-value pairs
+        String[] keyValuePairs = value.split(",");
         Map<String, String> map = new HashMap<>();
 
-        for (String pair : keyValuePairs)                        //iterate over the pairs
+        for (String pair : keyValuePairs)
         {
-            String[] entry = pair.split("=", 2);                   //split the pairs to get key and value
+            String[] entry = pair.split("=", 2);
 
             if (entry.length > 1) {
 
-                map.put(entry[0].trim(), entry[1].trim());          //add them to the hashmap and trim whitespaces
+                map.put(entry[0].trim(), entry[1].trim());
             }
 
         }
         return map;
-    }
-
-    public static Date toDate(String date, DateFormat format) {
-        Objects.requireNonNull(date);
-        Objects.requireNonNull(format);
-        try {
-            return format.parse(date);
-        } catch (ParseException ex) {
-            throw new RuntimeException(ex);
-        }
     }
 
     public static String toString(Date date, String format) {
@@ -96,7 +85,6 @@ public final class Utils {
     }
 
     @SafeVarargs
-    @SuppressWarnings("unchecked")
     public static <K, V> Map<K, V> createMapFromArray(Object... ts) {
         if (ts == null) {
             return new HashMap<>(0);
@@ -112,5 +100,61 @@ public final class Utils {
         return map;
     }
 
+    public static Date parseToDate(String year, String month, String day) {
+        StringBuilder stringBuilder = new StringBuilder();
 
+        stringBuilder
+                .append(year)
+                .append("/")
+                .append(month)
+                .append("/")
+                .append(day);
+
+        Date date = parseStringToDate(stringBuilder.toString());
+        return date;
+    }
+
+    public static int getAgeFromDate(Date birthDate) {
+        Calendar calendarNow = getCalendar(new Date(System.currentTimeMillis()));
+        Calendar calendarBirthDate = getCalendar(birthDate);
+
+        int age = calendarNow.get(Calendar.YEAR) - calendarBirthDate.get(Calendar.YEAR);
+
+        return age;
+
+    }
+
+    public static Calendar getCalendar(Date date) {
+        Calendar cal = Calendar.getInstance(Locale.US);
+        cal.setTime(date);
+        return cal;
+    }
+
+    public static Date parseStringToDate(String dateToParse){
+        DateFormat dateFormat = new SimpleDateFormat(FORMAT_DATE);
+        Date date = null;
+
+        try {
+            date = dateFormat.parse(dateToParse);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return date;
+    }
+
+    public static String dispatchView(TypeFile typeFile, IGenericDTO dto) {
+        String file = null;
+        switch (typeFile) {
+            case HTML:
+
+                break;
+            case XML:
+
+                break;
+            default:
+                file = "";
+        }
+        return file;
+    }
 }
