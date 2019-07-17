@@ -6,6 +6,8 @@ import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -20,7 +22,6 @@ public final class Utils {
     private Utils() {};
 
     static MessageDigest SHA256;
-    
     static {
         try {
             SHA256 = MessageDigest.getInstance("SHA-256");
@@ -31,6 +32,11 @@ public final class Utils {
     
     public static String toHexStringSHA256(String source, Charset charset) {
         return Hex.encodeHexString(toSHA256(source.getBytes(charset)));
+    }
+
+    public static LocalDate dateToLocalDate(String dateString){
+        Date d = Utils.toDate(dateString, new SimpleDateFormat("dd/mm/yyyy"));
+        return d.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
     }
     
     public static byte[] toSHA256(byte[] bytes) {

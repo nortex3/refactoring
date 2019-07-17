@@ -1,12 +1,8 @@
 package com.celfocus.training.user;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
-import com.celfocus.training.Saver;
-import com.celfocus.training.Saver.ItemInfo;
-import com.celfocus.training.Saver.ShoppingCart;
-import com.celfocus.training.Saver.User;
+import java.time.LocalDate;
+import com.celfocus.training.controllers.UserController;
+import com.celfocus.training.entities.User;
 import com.celfocus.training.util.Utils;
 
 /**
@@ -14,18 +10,25 @@ import com.celfocus.training.util.Utils;
  */
 public class UserRequesterFrontend {
 
+    private UserController userController;
+
+    public UserRequesterFrontend() {
+        this.userController = new UserController();
+    }
+
+
     /**
      * Metodo utilizado para retornar o Usuario no formato do frontend solicitado
      * @param type tipo do frontend utilizado
      * @param user usuario que será renderizado
      * @return o texto no formato solicitado com as informarções do user
-     */
+     *
     public String returnFrontendUser(String type, User user) {
         if (type.equals("html")) {
             return "<div>"
              + "<h1>User</h1>"
-             + "<span>" + user.nameOfUser + "</span>"
-             + "<span>" + user.bd + "</span>"
+             + "<span>" + user.getName() + "</span>"
+             + "<span>" + user.getDateOfBirth() + "</span>"
              + "<span>" + user.ifuserisolder + "</span>"
              + "</div>";
         } else {
@@ -46,7 +49,7 @@ public class UserRequesterFrontend {
      * @param type tipo do frontend utilizado
      * @param shoppingCart shoppingCart que será renderizado
      * @return o texto no formato solicitado com as informarções do shoppingCart
-     */
+     *
     public String returnFrontendShoppingCart(String type, ShoppingCart shoppingCart) {
         if (type.equals("html")) {
             return "<div>"
@@ -71,7 +74,7 @@ public class UserRequesterFrontend {
      * @param type tipo do frontend utilizado
      * @param item item que será renderizado
      * @return o texto no formato solicitado com as informarções do item
-     */
+     *
     public String returnFrontendItem(String type, ItemInfo item) {
         if (type.equals("html")) {
             return "<div>"
@@ -88,44 +91,50 @@ public class UserRequesterFrontend {
                 return "";
             }
         }
-    }
+    } */
 
     /**
      * Cria ou atualiza usuario
-     * @param arg0
-     * @param arg1
-     * @param arg2
+     * @param userName
+     * @param dateString
      */
-    public void createOrUpdateUser(String arg0, String arg1, String arg2) {
-        Saver saver = new Saver();
+    public void createUser(String userName, String dateString) {
+        LocalDate date = Utils.dateToLocalDate(dateString);
 
-        arg0 = arg0.toUpperCase();
-
-        Date d = Utils.toDate(arg1, new SimpleDateFormat("dd/mm/yyyy"));
-        if (new Date().getYear() - d.getYear() < 65) {
-            arg2 = "false";
+        boolean isOlder = false;
+        if (isOlder(date)) {
+            isOlder = true;
         }
 
-        saver.saveOrUpdateUser(arg0, Utils.toDate(arg1, new SimpleDateFormat("dd/mm/yyyy")), arg2.equals("true") ? true : false);
+        this.userController.saveUser(new User(userName.toUpperCase(), date, isOlder));
+    }
+
+    public void updateUser(String userName, String dateString, boolean isOlder) {
+        LocalDate date = Utils.dateToLocalDate(dateString);
+        this.userController.updateUser(new User(userName.toUpperCase(), date, isOlder));
+    }
+
+    private boolean isOlder(LocalDate date) {
+        return LocalDate.now().getYear() - date.getYear() >= 65;
     }
 
     /**
      * Remover Usuario
      */
-    public void deleteUser(String arg0) {
-        Saver saver = new Saver();
-        saver.deleteUserOrNot(arg0);
+    public void deleteUser(String username) {
+        //Saver saver = new Saver();
+        //saver.deleteUserOrNot(arg0);
+        this.userController.deleteUser(username);
+
     }
 
     /**
      * Adicionar item ao carrinho
      */
-    public void aitemShopping(String user, String nameItem, int qt) {
+    /*public void aitemShopping(String user, String nameItem, int qt) {
         Saver saver = new Saver();
-
         nameItem = nameItem.toLowerCase().concat("_item");
-
         saver.aIU(user, nameItem, qt);
-    }
+    }*/
 
 }
