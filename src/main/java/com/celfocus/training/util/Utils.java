@@ -1,5 +1,8 @@
 package com.celfocus.training.util;
 
+import com.celfocus.training.view.TypeFile;
+import org.apache.commons.codec.binary.Hex;
+
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -7,26 +10,33 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.logging.Logger;
 
-import org.apache.commons.codec.binary.Hex;
+import static com.celfocus.training.util.constant.ConstantStrings.FORMAT_DATE;
+import static java.util.logging.Level.SEVERE;
 
 public final class Utils {
 
-    private Utils() {};
+    static MessageDigest messageDigest;
+    private static Logger logger = Logger.getLogger(Utils.class.getName());
 
-    static MessageDigest SHA256;
-    
     static {
         try {
-            SHA256 = MessageDigest.getInstance("SHA-256");
+            messageDigest = MessageDigest.getInstance("SHA-256");
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+            throw new UnsupportedOperationException(e);
         }
+    }
+
+    private Utils() {
+        throw new IllegalStateException("Utility class");
     }
     
     public static String toHexStringSHA256(String source, Charset charset) {
@@ -34,7 +44,7 @@ public final class Utils {
     }
     
     public static byte[] toSHA256(byte[] bytes) {
-        return SHA256.digest(bytes);
+        return messageDigest.digest(bytes);
     }
 
     public static boolean isNullOrEmpty(String str) {
@@ -43,30 +53,20 @@ public final class Utils {
     
     public static Map<String, String> parseHTTPHeaderMap(String headers) {
         String value = headers.substring(1, headers.length() - 1);
-        String[] keyValuePairs = value.split(",");              //split the string to creat key-value pairs
+        String[] keyValuePairs = value.split(",");
         Map<String, String> map = new HashMap<>();
 
-        for (String pair : keyValuePairs)                        //iterate over the pairs
+        for (String pair : keyValuePairs)
         {
-            String[] entry = pair.split("=", 2);                   //split the pairs to get key and value
+            String[] entry = pair.split("=", 2);
 
             if (entry.length > 1) {
 
-                map.put(entry[0].trim(), entry[1].trim());          //add them to the hashmap and trim whitespaces
+                map.put(entry[0].trim(), entry[1].trim());
             }
 
         }
         return map;
-    }
-
-    public static Date toDate(String date, DateFormat format) {
-        Objects.requireNonNull(date);
-        Objects.requireNonNull(format);
-        try {
-            return format.parse(date);
-        } catch (ParseException ex) {
-            throw new RuntimeException(ex);
-        }
     }
 
     public static String toString(Date date, String format) {
@@ -96,7 +96,6 @@ public final class Utils {
     }
 
     @SafeVarargs
-    @SuppressWarnings("unchecked")
     public static <K, V> Map<K, V> createMapFromArray(Object... ts) {
         if (ts == null) {
             return new HashMap<>(0);
@@ -105,12 +104,65 @@ public final class Utils {
             throw new IllegalArgumentException("Length should be pair");
         }
         int length = ts.length / 2;
-        Map<K, V> map = new HashMap<K, V>(length);
+        Map<K, V> map = new HashMap<>(length);
         for (int index = 0; index <= length; index+=2) {
             map.put((K) ts[index], (V) ts[index + 1]);
         }
         return map;
     }
 
+    public static Date parseToDate(String year, String month, String day) {
+        StringBuilder stringBuilder = new StringBuilder();
 
+        stringBuilder
+                .append(year)
+                .append("/")
+                .append(month)
+                .append("/")
+                .append(day);
+
+        return parseStringToDate(stringBuilder.toString());
+    }
+
+    public static int getAgeFromDate(Date birthDate) {
+        Calendar calendarNow = getCalendar(new Date(System.currentTimeMillis()));
+        Calendar calendarBirthDate = getCalendar(birthDate);
+
+        return calendarNow.get(Calendar.YEAR) - calendarBirthDate.get(Calendar.YEAR);
+
+    }
+
+    public static Calendar getCalendar(Date date) {
+        Calendar cal = Calendar.getInstance(Locale.US);
+        cal.setTime(date);
+        return cal;
+    }
+
+    public static Date parseStringToDate(String dateToParse){
+        DateFormat dateFormat = new SimpleDateFormat(FORMAT_DATE);
+        Date date = null;
+
+        try {
+            date = dateFormat.parse(dateToParse);
+        } catch (ParseException e) {
+            logger.log(SEVERE, "", e);
+        }
+
+        return date;
+    }
+
+    public static String dispatchView(TypeFile typeFile) {
+        String file = null;
+        switch (typeFile) {
+            case HTML:
+
+                break;
+            case XML:
+
+                break;
+            default:
+                file = "";
+        }
+        return file;
+    }
 }
