@@ -15,6 +15,7 @@ import java.time.format.DateTimeFormatter;
  */
 public class UserRequesterFrontend {
 
+    public static final int OLDER_AGE_LIMIT_VALUE = 65;
     Saver saver = new Saver();
 
     /**
@@ -29,14 +30,14 @@ public class UserRequesterFrontend {
              + "<h1>User</h1>"
                 + "<span>" + user.getName() + "</span>"
                 + "<span>" + user.getDateOfBirth() + "</span>"
-                + "<span>" + user.isAdult() + "</span>"
+                + "<span>" + user.isOlder() + "</span>"
              + "</div>";
         } else {
             if (type.equals("xml")) {
                 return "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>"
                     + "<name> " + user.getName() + "</name>"
                     + "<bd>" + user.getDateOfBirth() + "</bd>"
-                    + "<older> " + user.isAdult() + "</older>";
+                    + "<older> " + user.isOlder() + "</older>";
             } else {
                 //do nothing
                 return "";
@@ -97,17 +98,13 @@ public class UserRequesterFrontend {
      * Create or update User Update
      * @param userName Name of user
      * @param dateOfBirthUnformatted DOB of User
-     * @param isAdult True for > 18
      */
-    public void createOrUpdateUser(String userName, String dateOfBirthUnformatted, String isAdult) {
+    public void updateUser(String userName, String dateOfBirthUnformatted) {
         LocalDate formattedDateOfBirth = Utils.toDate(dateOfBirthUnformatted, DateTimeFormatter.ofPattern("dd/mm/yyyy"));
         int yearsOfAge = Period.between(formattedDateOfBirth, LocalDate.now()).getYears();
-        if (yearsOfAge < 65) {
-            isAdult = "false";
-        }
 
         saver.UpdateUser(userName.toUpperCase(), Utils.toDate(dateOfBirthUnformatted, DateTimeFormatter.ofPattern("dd/mm/yyyy")),
-                         Boolean.getBoolean(isAdult));
+                         yearsOfAge >= OLDER_AGE_LIMIT_VALUE);
     }
 
     /**
