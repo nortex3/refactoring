@@ -1,6 +1,5 @@
 package com.celfocus.training.business.impl;
 
-
 import com.celfocus.training.business.IProductBusiness;
 import com.celfocus.training.business.IShopBusiness;
 import com.celfocus.training.business.IUserBusiness;
@@ -13,12 +12,15 @@ import com.celfocus.training.model.User;
 import com.celfocus.training.util.Utils;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
-import static com.celfocus.training.util.constant.ConstantNumbers.*;
+import static com.celfocus.training.util.constant.ConstantNumbers.EIGHTY_YEAROLD;
+import static com.celfocus.training.util.constant.ConstantNumbers.START_ID;
+import static com.celfocus.training.util.constant.ConstantNumbers.START_QUANTITY;
+import static java.util.logging.Level.SEVERE;
 
 /*
     -shop add product in user list
@@ -31,6 +33,7 @@ public class ShopBusinessImp implements IShopBusiness {
     private IUserBusiness userBusiness;
     private IProductBusiness productBusiness;
     private Map<User, List<ShopCartItem>> shoppingCartUser;
+    private static Logger logger = Logger.getLogger(ShopBusinessImp.class.getName());
 
     public ShopBusinessImp(IUserBusiness userBusiness, IProductBusiness productBusiness) {
         this.shoppingCartUser = new HashMap();
@@ -60,7 +63,10 @@ public class ShopBusinessImp implements IShopBusiness {
         Discount discount = this.getDiscountForUser(user);
 
         ShopCartItem shopCartItem = new ShopCartItem(nextId, product, discount, START_QUANTITY);
-        userShoppingCartItemList.add(shopCartItem);
+
+        if (userShoppingCartItemList != null) {
+            userShoppingCartItemList.add(shopCartItem);
+        }
 
         this.shoppingCartUser.replace(user, userShoppingCartItemList);
 
@@ -110,7 +116,7 @@ public class ShopBusinessImp implements IShopBusiness {
                 throw new BusinessException("Product not found.");
             }
         } catch (BusinessException e) {
-            e.printStackTrace();
+            logger.log(SEVERE, "", e);
         }
     }
 
@@ -119,14 +125,9 @@ public class ShopBusinessImp implements IShopBusiness {
             return false;
         }
 
-        boolean haveProduct = userShoppingCardList.stream()
-                .anyMatch(shopCartItem -> shopCartItem.getProduct().getProductName().equals(product.getProductName()));
+        return userShoppingCardList.stream()
+                                   .anyMatch(shopCartItem -> shopCartItem.getProduct().getProductName().equals(product.getProductName()));
 
-        if (haveProduct) {
-            return true;
-        }
-
-        return false;
     }
 
     private List<ShopCartItem> increaseProductQuantity(Product product, List<ShopCartItem> userShoppingCardList) {

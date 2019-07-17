@@ -12,7 +12,7 @@ import org.springframework.beans.BeanUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.celfocus.training.util.constant.ConstantNumbers.*;
+import static com.celfocus.training.util.constant.ConstantNumbers.ID_TO_DEFAULT;
 
 public class ProductControllerImp implements IProductController {
 
@@ -86,10 +86,7 @@ public class ProductControllerImp implements IProductController {
     }
 
     private boolean isProductDTOFromViewNull(ProductDTO productDTOFromView) {
-        if (productDTOFromView == null || productDTOFromView.getProductName() == null) {
-            return true;
-        }
-        return false;
+        return productDTOFromView == null || productDTOFromView.getProductName() == null;
     }
 
     private Product convertProductDtoToProduct(ProductDTO productDTOFromView) {

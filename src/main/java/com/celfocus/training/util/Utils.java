@@ -1,31 +1,42 @@
 package com.celfocus.training.util;
 
+import com.celfocus.training.view.TypeFile;
+import org.apache.commons.codec.binary.Hex;
+
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
-
-import com.celfocus.training.View.TypeFile;
-import com.celfocus.training.controller.dtos.IGenericDTO;
-import org.apache.commons.codec.binary.Hex;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
+import java.util.logging.Logger;
 
 import static com.celfocus.training.util.constant.ConstantStrings.FORMAT_DATE;
+import static java.util.logging.Level.SEVERE;
 
 public final class Utils {
 
-    private Utils() {};
+    static MessageDigest messageDigest;
+    private static Logger logger = Logger.getLogger(Utils.class.getName());
 
-    static MessageDigest SHA256;
-    
     static {
         try {
-            SHA256 = MessageDigest.getInstance("SHA-256");
+            messageDigest = MessageDigest.getInstance("SHA-256");
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+            throw new UnsupportedOperationException(e);
         }
+    }
+
+    private Utils() {
+        throw new IllegalStateException("Utility class");
     }
     
     public static String toHexStringSHA256(String source, Charset charset) {
@@ -33,7 +44,7 @@ public final class Utils {
     }
     
     public static byte[] toSHA256(byte[] bytes) {
-        return SHA256.digest(bytes);
+        return messageDigest.digest(bytes);
     }
 
     public static boolean isNullOrEmpty(String str) {
@@ -93,7 +104,7 @@ public final class Utils {
             throw new IllegalArgumentException("Length should be pair");
         }
         int length = ts.length / 2;
-        Map<K, V> map = new HashMap<K, V>(length);
+        Map<K, V> map = new HashMap<>(length);
         for (int index = 0; index <= length; index+=2) {
             map.put((K) ts[index], (V) ts[index + 1]);
         }
@@ -110,17 +121,14 @@ public final class Utils {
                 .append("/")
                 .append(day);
 
-        Date date = parseStringToDate(stringBuilder.toString());
-        return date;
+        return parseStringToDate(stringBuilder.toString());
     }
 
     public static int getAgeFromDate(Date birthDate) {
         Calendar calendarNow = getCalendar(new Date(System.currentTimeMillis()));
         Calendar calendarBirthDate = getCalendar(birthDate);
 
-        int age = calendarNow.get(Calendar.YEAR) - calendarBirthDate.get(Calendar.YEAR);
-
-        return age;
+        return calendarNow.get(Calendar.YEAR) - calendarBirthDate.get(Calendar.YEAR);
 
     }
 
@@ -137,13 +145,13 @@ public final class Utils {
         try {
             date = dateFormat.parse(dateToParse);
         } catch (ParseException e) {
-            e.printStackTrace();
+            logger.log(SEVERE, "", e);
         }
 
         return date;
     }
 
-    public static String dispatchView(TypeFile typeFile, IGenericDTO dto) {
+    public static String dispatchView(TypeFile typeFile) {
         String file = null;
         switch (typeFile) {
             case HTML:

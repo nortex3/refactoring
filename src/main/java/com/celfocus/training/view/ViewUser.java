@@ -1,4 +1,4 @@
-package com.celfocus.training.View;
+package com.celfocus.training.view;
 
 import com.celfocus.training.business.exception.DeleteException;
 import com.celfocus.training.business.exception.FindException;
@@ -8,13 +8,16 @@ import com.celfocus.training.controller.dtos.UserDTO;
 import com.celfocus.training.util.Utils;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 import static com.celfocus.training.util.constant.ConstantNumbers.SIXTY_FIVE_YEAROLD;
-
+import static java.util.logging.Level.INFO;
+import static java.util.logging.Level.SEVERE;
 
 public class ViewUser {
 
     private IUserController userController;
+    private static Logger logger = Logger.getLogger(ViewUser.class.getName());
 
     public ViewUser(IUserController userController) {
         this.userController = userController;
@@ -36,11 +39,9 @@ public class ViewUser {
 
     private void saveUserDto(UserDTO userDTO) {
         try {
-
             this.userController.createUser(userDTO);
-
         } catch (SaveException e) {
-            e.printStackTrace();
+            logger.log(SEVERE, "Save", e);
         }
     }
 
@@ -55,55 +56,23 @@ public class ViewUser {
     public void printUsers(){
         List<UserDTO> userDTOList = userController.getAllUserDTO();
 
-        System.out.println();
-        System.out.println("All Users");
-        System.out.println("----------------");
+        logger.log(INFO, "All Users");
+        logger.log(INFO, "----------------");
+
+
 
         for (UserDTO userDTO : userDTOList) {
-            System.out.println(userDTO);
+            logger.log(INFO, "Object {0}", userDTO);
         }
 
-        System.out.println("----------------");
-        System.out.println();
-    }
-
-    public String showUser(TypeFile typeFile, UserDTO userDTO) {
-        return "";
-    }
-
-    private String buildFileUserXml(UserDTO userDTO) {
-        StringBuilder stringBuilder = new StringBuilder();
-
-        stringBuilder
-                .append("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\" ?>")
-                .append("<productName>").append(userDTO.getUsername()).append("<productName>")
-                .append("<birthDate>").append(userDTO.getBirthDate().toString()).append("<birthDate>")
-                .append("<older>").append(userDTO.isMajor()).append("<older>");
-
-        return stringBuilder.toString();
-    }
-
-    private String buildFileUserHtml(UserDTO userDTO) {
-        StringBuilder stringBuilder = new StringBuilder();
-
-        stringBuilder
-                .append("<div>")
-                .append("<h1>User</h1>")
-                .append("<span>").append(userDTO.getUsername()).append("<span>")
-                .append("<span>").append(userDTO.getBirthDate().toString()).append("<span>")
-                .append("<span>").append(userDTO.isMajor()).append("<span>")
-                .append("</div>");
-
-        return stringBuilder.toString();
+        logger.log(INFO, "----------------");
     }
 
     public void updateUser(UserDTO userDTO) {
         try {
             userController.updateUser(userDTO);
-        } catch (SaveException e) {
-            e.printStackTrace();
-        } catch (FindException e) {
-            e.printStackTrace();
+        } catch (SaveException | FindException e) {
+            logger.log(SEVERE, "", e);
         }
     }
 
@@ -111,7 +80,7 @@ public class ViewUser {
         try {
             userController.deleteUser(userDTO);
         } catch (DeleteException e) {
-            e.printStackTrace();
+            logger.log(SEVERE, "", e);
         }
     }
 

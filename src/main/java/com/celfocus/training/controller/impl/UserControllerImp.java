@@ -12,7 +12,7 @@ import org.springframework.beans.BeanUtils;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.celfocus.training.util.constant.ConstantNumbers.*;
+import static com.celfocus.training.util.constant.ConstantNumbers.ID_TO_DEFAULT;
 
 public class UserControllerImp implements IUserController {
 
@@ -95,9 +95,6 @@ public class UserControllerImp implements IUserController {
     }
 
     private boolean isUserDTOFromViewNull(UserDTO userDTO) {
-        if (userDTO == null || userDTO.getUsername() == null) {
-            return true;
-        }
-        return false;
+        return userDTO == null || userDTO.getUsername() == null;
     }
 }
