@@ -1,231 +1,137 @@
 package com.celfocus.training;
 
+import com.celfocus.training.entity.Item;
+import com.celfocus.training.entity.ShoppingCart;
+import com.celfocus.training.entity.User;
+
+import java.time.LocalDate;
+import java.time.Period;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
-/**
- * Temos 4 entidades em nosso projeto User, ShoppingCart, ShoppingCartItem e ItemInfo
- */
 public class Saver {
 
-    private static final List<User> users = new ArrayList<>();
-    private static final List<ShoppingCart> shoppingCarts = new ArrayList<>();
-    private static final List<ItemInfo> itens = new ArrayList<>();
+    private static final List<User> userList = new ArrayList<>();
+    private static final List<ShoppingCart> shoppingCartList = new ArrayList<>();
+    private static final List<Item> itemList = new ArrayList<>();
 
-    public static class User {
-        
-        public String nameOfUser; // nome
+    private User createUser(String name, LocalDate dateOfBirth, boolean isAdult) {
 
-        public Date bd; // data de nascimento
+        User user = new User(name, dateOfBirth, isAdult);
+        userList.add(user);
 
-        public boolean ifuserisolder; // se usuário é maior de idade
+        ShoppingCart shoppingCart = new ShoppingCart(user);
+        shoppingCartList.add(shoppingCart);
 
-    }
-
-    public static class ShoppingCart {
-        
-        public User user;
-
-        public List<ShoppingCartItem> itens;
-    }
-
-    public static class ShoppingCartItem {
-
-        public ItemInfo item;
-
-        public int qt;
-
-        public double discount;
+        return user;
 
     }
 
-    public static class ItemInfo {
+    public User UpdateUser(String name, LocalDate dateOfBirth, boolean isAdult) {
 
-        public String name;
-
-        public double valor;
-    }
-
-    public User saveOrUpdateUser(String name, Date bd, boolean ifuserisolder) {
-        if (eu(name)) {
-            User user = fu(name);
-            user.bd = bd;
-            user.ifuserisolder = ifuserisolder;
-            ShoppingCart found = null;
-            for (ShoppingCart var : shoppingCarts) {
-                if (var.user == user) {
-                    found = var;
-                }
-            }
-
-            if (found != null) {
-                //do nothing
-            } else {
-                ShoppingCart s = new ShoppingCart();
-                s.user = user;
-                shoppingCarts.add(s);
-            }
-            users.add(user);
-            return user;
-        } else {
-            User user = new User();
-            user.bd = bd;
-            user.nameOfUser = name;
-            user.ifuserisolder = ifuserisolder;
-            users.add(user);
-            ShoppingCart s = new ShoppingCart();
-            s.user = user;
-            s.itens = new ArrayList<>();
-            shoppingCarts.add(s);
-            return user;
-        }
-    }
-
-    private boolean eu(String name) {
-        User userFound = null;
-        for (User user : users) {
-            if (user.nameOfUser.equals(name)) {
-                userFound = user;
-            }
-        }
-        return userFound != null;
-    }
-
-    private User fu(String name) {
-        User userFound = null;
-        for (User user : users) {
-            if (user.nameOfUser.equals(name)) {
-                userFound = user;
-            }
-        }
-        return userFound;
-    }
-
-    public ItemInfo encontrarItem(String name) {
-        ItemInfo itemFound = null;
-        for (ItemInfo item : itens) {
-            if (item.name.equals(name)) {
-                itemFound = item;
-            }
-        }
-        return itemFound;
-    }
-
-    public void deleteUserOrNot(String name) {
-        User userFound = null;
-        for (User user : users) {
-            if (user.nameOfUser.equals(name)) {
-                userFound = user;
-            }
-        }
-        if (userFound == null) {
-        } else {
-            users.remove(userFound);
-        }
-    }
-
-    public void aIU(String user, String nameItem, int qt) {
-        User userFound = null;
-        for (User user1 : users) {
-            if (user1.nameOfUser.equals(user)) {
-                userFound = user1;
-            }
+        if (!userExists(name)) {
+            return this.createUser(name, dateOfBirth, isAdult);
         }
 
-        if (userFound != null) {
-            ShoppingCart found = null;
-            for (ShoppingCart var : shoppingCarts) {
-                if (var.user == userFound) {
-                    found = var;
-                }
-            }
+        User user = getUserByName(name);
 
-            if (found != null) {
-                ShoppingCartItem scif = null;
-                for (ShoppingCartItem s : found.itens) {
-                    if (s.item.name == nameItem) {
-                        scif = s;
-                    }
-                }
+        user.setDateOfBirth(dateOfBirth);
+        user.setAdult(isAdult);
 
-                if (scif != null) {
-                    scif.qt += qt;
-                } else {
-                    ItemInfo ifo = null;
-                    for (ItemInfo item : itens) {
-                        if (item.name.equals(nameItem)) {
-                            ifo = item;
-                        }
-                    }
+        if (!shoppingCartExists(user)) {
+            ShoppingCart shoppingCart = new ShoppingCart(user);
+            shoppingCartList.add(shoppingCart);
+        }
 
-                    if (ifo != null) {
-                        ShoppingCartItem s1 = new ShoppingCartItem();
-                        s1.item = ifo;
-                        s1.qt = qt;
-                        if ( userFound.ifuserisolder
-                 == true && (new Date().getYear() - userFound.bd.getYear() < 80) ) {
-                            s1.discount = 0.2; 
-                        } else if (userFound.ifuserisolder
-                 == true) {
-                            s1.discount = 0.1;
-                        }
-                    } else {
+        return user;
+    }
 
-                    }
-                    
-                }
+    public void deleteUser(String name) {
+        for (User user : userList) {
+            if (name.equals(user.getName())) {
+                userList.remove(user);
             }
         }
     }
 
-    public void rIU(String user, String nameItem) {
-        User userFound = null;
-        for (User user1 : users) {
-            if (user1.nameOfUser.equals(user)) {
-                userFound = user1;
-            }
+    public void addItemToBasket(String userName, String itemName, int quantity) {
+
+        if (!userExists(userName)) {
+            throw new IllegalArgumentException("Can´t find user");
+        }
+        User user = this.getUserByName(userName);
+
+        if (!shoppingCartExists(user)) {
+            throw new IllegalArgumentException("Can´t find user's shopping cart");
+        }
+        ShoppingCart userShoppingCart = getShoppingCartByUser(user);
+
+        Item item = getItemShoppingCartByName(userShoppingCart.getItems(), itemName);
+
+        if (item != null) {
+            item.addQuantity(quantity);
+            return;
         }
 
-        if (userFound != null) {
-            ShoppingCart found = null;
-            for (ShoppingCart var : shoppingCarts) {
-                if (var.user == userFound) {
-                    found = var;
-                }
-            }
+        Item itemFromList = findItemByName(itemName);
+        if (itemFromList != null) {
+            Item newItemToBasket = new Item(itemFromList.getName(), itemFromList.getValor(), quantity);
 
-            if (found != null) {
-                ShoppingCartItem scif = null;
-                for (ShoppingCartItem s : found.itens) {
-                    if (s.item.name == nameItem) {
-                        scif = s;
-                    }
-                }
-
-                if (scif != null) {
-                    found.itens.remove(scif);
-                }
+            if (user.isAdult()) {
+                int yearsOfAge = Period.between(user.getDateOfBirth(), LocalDate.now()).getYears();
+                newItemToBasket.setDiscount(yearsOfAge < 80 ? 0.2 : 0.1);
             }
         }
     }
 
-    public void citemifnotexists(String arg0, double v) {
-        ItemInfo f = null;
-        for (ItemInfo i : itens){
-            if (i.name == arg0) {
-                f = i;
-            }
+    public void removeItemFromBasket(String userName, String itemName) {
+        if (!userExists(userName)) {
+            throw new IllegalArgumentException("Can´t find user");
         }
+        User user = this.getUserByName(userName);
 
-        if ( f != null ) {
-
-        } else {
-            ItemInfo ift = new ItemInfo();
-            ift.name = arg0;
-            ift.valor = v;
-            itens.add(ift);
+        if (!shoppingCartExists(user)) {
+            throw new IllegalArgumentException("Can´t find user's shopping cart");
         }
+        ShoppingCart userShoppingCart = getShoppingCartByUser(user);
+        removeItemFromShoppingCart(userShoppingCart.getItems(), itemName);
+    }
+
+    public void createItem(String itemName, double valor) {
+
+        Item itemFromList = findItemByName(itemName);
+
+        if (itemFromList == null) {
+            itemList.add(new Item(itemName, valor));
+        }
+    }
+
+    private boolean shoppingCartExists(User user) {
+        return shoppingCartList.stream().anyMatch(shoppingCart -> user == shoppingCart.getUser());
+    }
+
+    private ShoppingCart getShoppingCartByUser(User user) {
+        return shoppingCartList.stream().filter(shoppingCart -> shoppingCart.getUser() == user).findFirst().orElse(null);
+    }
+
+    private boolean userExists(String name) {
+        return userList.stream().anyMatch(user -> name.equals(user.getName()));
+    }
+
+    private User getUserByName(String name) {
+        return userList.stream().filter(user -> name.equals(user.getName())).findFirst().orElse(null);
+    }
+
+    private Item findItemByName(String name) {
+        return itemList.stream().filter(item -> name.equals(item.getName())).findFirst().orElse(null);
+    }
+
+    private Item getItemShoppingCartByName(List<Item> userShoppingCartItems, String itemName) {
+        return userShoppingCartItems.stream().filter(item -> itemName.equals(item.getName())).findFirst().orElse(null);
+    }
+
+    private void removeItemFromShoppingCart(List<Item> userShoppingCartItems, String itemName) {
+        userShoppingCartItems.stream().filter(item -> itemName.equals(item.getName())).findFirst().ifPresent(userShoppingCartItems::remove);
     }
 
 } 

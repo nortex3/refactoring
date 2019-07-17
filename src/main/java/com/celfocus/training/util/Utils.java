@@ -1,11 +1,15 @@
 package com.celfocus.training.util;
 
+import org.apache.commons.codec.binary.Hex;
+
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -13,13 +17,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.apache.commons.codec.binary.Hex;
-
 public final class Utils {
 
-    private Utils() {};
-
-    static MessageDigest SHA256;
+    private static MessageDigest SHA256;
     
     static {
         try {
@@ -32,8 +32,8 @@ public final class Utils {
     public static String toHexStringSHA256(String source, Charset charset) {
         return Hex.encodeHexString(toSHA256(source.getBytes(charset)));
     }
-    
-    public static byte[] toSHA256(byte[] bytes) {
+
+    private static byte[] toSHA256(byte[] bytes) {
         return SHA256.digest(bytes);
     }
 
@@ -59,12 +59,12 @@ public final class Utils {
         return map;
     }
 
-    public static Date toDate(String date, DateFormat format) {
+    public static LocalDate toDate(String date, DateTimeFormatter format) {
         Objects.requireNonNull(date);
         Objects.requireNonNull(format);
         try {
-            return format.parse(date);
-        } catch (ParseException ex) {
+            return LocalDate.parse(date, format);
+        } catch (DateTimeParseException ex) {
             throw new RuntimeException(ex);
         }
     }
@@ -73,7 +73,7 @@ public final class Utils {
         return toString(date, new SimpleDateFormat(format));
     }
 
-    public static String toString(Date date, DateFormat format) {
+    private static String toString(Date date, DateFormat format) {
         Objects.requireNonNull(date);
         Objects.requireNonNull(format);
         return format.format(date);
