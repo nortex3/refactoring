@@ -5,8 +5,11 @@ import com.celfocus.training.business.exception.FindException;
 import com.celfocus.training.business.exception.SaveException;
 import com.celfocus.training.model.User;
 
-public interface IUserBusiness extends IOperations<User> {
+import java.util.List;
 
+public interface IUserBusiness {
+
+    List<User> getAllUsers();
     boolean existingUser(User user);
     User findUserByName(String username);
     void saveUser(User user) throws SaveException;

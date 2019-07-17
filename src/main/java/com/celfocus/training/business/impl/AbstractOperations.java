@@ -1,36 +1,49 @@
 package com.celfocus.training.business.impl;
 
 import com.celfocus.training.business.IOperations;
+import com.celfocus.training.business.exception.DeleteException;
+import com.celfocus.training.business.exception.SaveException;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
-public abstract class AbstractOperations<T> implements IOperations<T> {
 
-    private List<Class<T>> listModel;
-    private Class<T> modelType;
+import static com.celfocus.training.util.constant.ConstantNumbers.*;
 
-    public AbstractOperations(Class<T> modelType) {
-        this.modelType = modelType;
-        this.listModel = new ArrayList<>();
+abstract class AbstractOperations<T> implements IOperations<T> {
+
+    private List<T> mapModel;
+
+    public AbstractOperations() {
+        this.mapModel = new ArrayList<>();
     }
 
-
-    public void save(Class<T> model) {
-        this.listModel.add(model);
+    @Override
+    public List<T> getAll() {
+        return this.mapModel;
     }
 
-    public void update(Class<T> model, int indexInList) {
-        this.listModel.set(indexInList, model);
+    @Override
+    public void save(T model) throws SaveException {
+        this.mapModel.add(model);
     }
 
-    public List<Class<T>> findAll() {
-        return this.listModel;
+    @Override
+    public void update(int indexInList, T model) throws SaveException {
+        this.mapModel.set(indexInList, model);
     }
 
-    public void delete(Class<T> model) {
-        this.listModel.remove(model);
+    @Override
+    public void delete(int index) throws DeleteException {
+        this.mapModel.remove(index);
+    }
+
+    public int getNextIndex() {
+        return mapModel.isEmpty() ? START_ID : mapModel.size() + 1;
+    }
+
+    public int getIndex(T model) {
+        return this.mapModel.indexOf(model);
     }
 
 }

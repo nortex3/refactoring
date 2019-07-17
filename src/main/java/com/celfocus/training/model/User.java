@@ -8,6 +8,10 @@ public class User extends AbstractModel {
     private Date birthDate;
     private boolean isMajor;
 
+    public User(int id) {
+        super(id);
+    }
+
     public User(int id, String username, Date birthDate, boolean isMajor){
         super(id);
         this.username = username;
@@ -33,5 +37,9 @@ public class User extends AbstractModel {
 
     public void setMajor(boolean major) {
         isMajor = major;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 }
