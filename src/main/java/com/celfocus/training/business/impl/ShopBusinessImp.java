@@ -169,7 +169,7 @@ public class ShopBusinessImp implements IShopBusiness {
     }
 
     private boolean userHaveShoppingCard(User user) {
-        this.shoppingCartUser.ge
+        
         return this.shoppingCartUser.containsKey(user);
     }
 
