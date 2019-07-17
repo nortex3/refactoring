@@ -1,5 +1,7 @@
 package com.celfocus.training.util;
 
+import org.apache.commons.codec.binary.Hex;
+
 import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -7,73 +9,78 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import org.apache.commons.codec.binary.Hex;
+public final class Util {
+    private static final Logger logger = Logger.getLogger(Util.class.getName());
 
-public final class Utils {
+    private Util() {
+    }
 
-    private Utils() {};
+    private static MessageDigest SHA256;
 
-    static MessageDigest SHA256;
-    
     static {
         try {
             SHA256 = MessageDigest.getInstance("SHA-256");
         } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
+            logger.log(Level.SEVERE, "Error getting SHA-256 instance", e);
         }
     }
-    
+
     public static String toHexStringSHA256(String source, Charset charset) {
         return Hex.encodeHexString(toSHA256(source.getBytes(charset)));
     }
-    
-    public static byte[] toSHA256(byte[] bytes) {
+
+    private static byte[] toSHA256(byte[] bytes) {
         return SHA256.digest(bytes);
     }
 
     public static boolean isNullOrEmpty(String str) {
-		return str == null || str.isEmpty();
+        return str == null || str.isEmpty();
     }
-    
+
     public static Map<String, String> parseHTTPHeaderMap(String headers) {
         String value = headers.substring(1, headers.length() - 1);
-        String[] keyValuePairs = value.split(",");              //split the string to creat key-value pairs
+        String[] keyValuePairs = value.split(",");
         Map<String, String> map = new HashMap<>();
 
-        for (String pair : keyValuePairs)                        //iterate over the pairs
-        {
-            String[] entry = pair.split("=", 2);                   //split the pairs to get key and value
+        for (String pair : keyValuePairs) {
+            String[] entry = pair.split("=", 2);
 
             if (entry.length > 1) {
-
-                map.put(entry[0].trim(), entry[1].trim());          //add them to the hashmap and trim whitespaces
+                map.put(entry[0].trim(), entry[1].trim());
             }
-
         }
+
         return map;
     }
 
     public static Date toDate(String date, DateFormat format) {
         Objects.requireNonNull(date);
         Objects.requireNonNull(format);
+
+        Date result = null;
         try {
-            return format.parse(date);
-        } catch (ParseException ex) {
-            throw new RuntimeException(ex);
+            result = format.parse(date);
+        } catch (ParseException e) {
+            logger.log(Level.SEVERE, "Error parsing date", e);
         }
+
+        return result;
     }
 
     public static String toString(Date date, String format) {
         return toString(date, new SimpleDateFormat(format));
     }
 
-    public static String toString(Date date, DateFormat format) {
+    private static String toString(Date date, DateFormat format) {
         Objects.requireNonNull(date);
         Objects.requireNonNull(format);
         return format.format(date);
@@ -84,33 +91,34 @@ public final class Utils {
     }
 
     @SafeVarargs
-    public static <T> java.util.List<T> createListFromArray(T... ts) {
-        if (ts == null) {
+    public static <T> List<T> createListFromArray(T... arr) {
+        if (arr == null) {
             return new ArrayList<>(0);
         }
-        java.util.List<T> list = new ArrayList<>(ts.length);
-        for (T t : ts) {
-            list.add(t);
-        }
+
+        List<T> list = new ArrayList<>(arr.length);
+        Collections.addAll(list, arr);
+
         return list;
     }
 
     @SafeVarargs
     @SuppressWarnings("unchecked")
-    public static <K, V> Map<K, V> createMapFromArray(Object... ts) {
-        if (ts == null) {
+    public static <K, V> Map<K, V> createMapFromArray(Object... arr) {
+        if (arr == null) {
             return new HashMap<>(0);
         }
-        if (ts.length % 2 != 0) {
+
+        if (arr.length % 2 != 0) {
             throw new IllegalArgumentException("Length should be pair");
         }
-        int length = ts.length / 2;
-        Map<K, V> map = new HashMap<K, V>(length);
-        for (int index = 0; index <= length; index+=2) {
-            map.put((K) ts[index], (V) ts[index + 1]);
+
+        int length = arr.length / 2;
+        Map<K, V> map = new HashMap<>(length);
+        for (int index = 0; index <= length; index += 2) {
+            map.put((K) arr[index], (V) arr[index + 1]);
         }
+
         return map;
     }
-
-
 }
